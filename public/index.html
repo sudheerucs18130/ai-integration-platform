@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Autonomous Integration Platform</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar" aria-label="Primary">
+        <div class="brand">
+          <span class="brand-mark">AI</span>
+          <div>
+            <strong>ResilienceOps</strong>
+            <small>Autonomous integrations</small>
+          </div>
+        </div>
+        <nav class="nav-list">
+          <a href="#overview">Overview</a>
+          <a href="#workflows">Workflows</a>
+          <a href="#applications">Real Apps</a>
+          <a href="#incidents">Incidents</a>
+          <a href="#actions">Recovery</a>
+          <a href="#policies">Policies</a>
+          <a href="#audit">Audit</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Enterprise integration resilience</p>
+            <h1>Autonomous Integration Platform</h1>
+          </div>
+          <div class="topbar-actions">
+            <span id="sourceStatus" class="source-pill">Source pending</span>
+            <span id="streamStatus" class="stream-pill">Connecting</span>
+            <button id="refreshBtn" class="button secondary" type="button">Refresh</button>
+          </div>
+        </header>
+
+        <section id="overview" class="kpi-grid" aria-label="Platform summary"></section>
+
+        <section class="workbench">
+          <section class="panel panel-large" aria-labelledby="healthTitle">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Live telemetry</p>
+                <h2 id="healthTitle">Workflow Health</h2>
+              </div>
+              <label class="select-label">
+                <span>Scope</span>
+                <select id="workflowFilter"></select>
+              </label>
+            </div>
+            <div class="chart-stack">
+              <canvas id="riskCanvas" width="920" height="240" aria-label="Risk score chart"></canvas>
+              <canvas id="telemetryCanvas" width="920" height="220" aria-label="Telemetry trend chart"></canvas>
+            </div>
+          </section>
+
+          <section class="panel" id="incidents" aria-labelledby="incidentTitle">
+            <div class="panel-header compact">
+              <div>
+                <p class="eyebrow">Response</p>
+                <h2 id="incidentTitle">Active Incidents</h2>
+              </div>
+            </div>
+            <div id="incidentList" class="stack-list"></div>
+          </section>
+        </section>
+
+        <section class="panel" id="applications" aria-labelledby="applicationsTitle">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Real-time issues</p>
+              <h2 id="applicationsTitle">Real Application Monitors</h2>
+            </div>
+          </div>
+          <form id="applicationForm" class="application-form">
+            <label>
+              <span>Name</span>
+              <input id="appName" name="name" type="text" placeholder="IBM App Connect Order Flow" />
+            </label>
+            <label class="wide">
+              <span>Health or API URL</span>
+              <input id="appUrl" name="url" type="url" placeholder="https://application.example.com/health" required />
+            </label>
+            <label>
+              <span>SLA ms</span>
+              <input id="appSla" name="sla_target_ms" type="number" min="50" max="60000" value="1000" />
+            </label>
+            <label>
+              <span>Criticality</span>
+              <select id="appCriticality" name="business_criticality">
+                <option value="high">High</option>
+                <option value="mission_critical">Mission critical</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </label>
+            <button class="button" type="submit">Monitor</button>
+          </form>
+          <div id="applicationList" class="stack-list"></div>
+        </section>
+
+        <section class="panel" id="workflows" aria-labelledby="workflowTitle">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Registry</p>
+              <h2 id="workflowTitle">Integration Workflows</h2>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Workflow</th>
+                  <th>Owner</th>
+                  <th>Source</th>
+                  <th>Status</th>
+                  <th>SLA</th>
+                  <th>Latency</th>
+                  <th>Error Rate</th>
+                  <th>Risk</th>
+                  <th>Driver</th>
+                </tr>
+              </thead>
+              <tbody id="workflowTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="split-grid">
+          <section class="panel" aria-labelledby="predictionTitle">
+            <div class="panel-header compact">
+              <div>
+                <p class="eyebrow">Failure analytics</p>
+                <h2 id="predictionTitle">Predictions</h2>
+              </div>
+            </div>
+            <div class="table-wrap compact-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Workflow</th>
+                    <th>Risk</th>
+                    <th>Horizon</th>
+                    <th>Confidence</th>
+                  </tr>
+                </thead>
+                <tbody id="predictionTable"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel" id="actions" aria-labelledby="actionTitle">
+            <div class="panel-header compact">
+              <div>
+                <p class="eyebrow">Self-healing</p>
+                <h2 id="actionTitle">Recovery Actions</h2>
+              </div>
+            </div>
+            <div id="actionList" class="stack-list"></div>
+          </section>
+        </section>
+
+        <section class="split-grid">
+          <section class="panel" id="policies" aria-labelledby="policyTitle">
+            <div class="panel-header compact">
+              <div>
+                <p class="eyebrow">Governance</p>
+                <h2 id="policyTitle">Policies</h2>
+              </div>
+            </div>
+            <div id="policyList" class="stack-list"></div>
+          </section>
+
+          <section class="panel" id="audit" aria-labelledby="auditTitle">
+            <div class="panel-header compact">
+              <div>
+                <p class="eyebrow">Traceability</p>
+                <h2 id="auditTitle">Audit Log</h2>
+              </div>
+            </div>
+            <div id="auditList" class="audit-list"></div>
+          </section>
+        </section>
+      </main>
+    </div>
+    <script src="/app.js" defer></script>
+  </body>
+</html>

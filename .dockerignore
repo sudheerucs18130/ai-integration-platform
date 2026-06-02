@@ -1,0 +1,10 @@
+.git
+.github
+__pycache__/
+*.pyc
+.DS_Store
+data/*.db
+data/*.db-shm
+data/*.db-wal
+docs/
+deploy/

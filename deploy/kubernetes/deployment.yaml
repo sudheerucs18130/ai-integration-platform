@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: autonomous-integration-platform
+  labels:
+    app: autonomous-integration-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: autonomous-integration-platform
+  template:
+    metadata:
+      labels:
+        app: autonomous-integration-platform
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/OWNER/autonomous-integration-platform:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: HOST
+              value: "0.0.0.0"
+            - name: PORT
+              value: "8000"
+            - name: AIP_SOURCE_MODE
+              value: "auto"
+            - name: AIP_DB_PATH
+              value: "/app/data/platform.db"
+            - name: IBM_TELEMETRY_URL
+              valueFrom:
+                secretKeyRef:
+                  name: aip-ibm-secrets
+                  key: IBM_TELEMETRY_URL
+                  optional: true
+            - name: IBM_TELEMETRY_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: aip-ibm-secrets
+                  key: IBM_TELEMETRY_TOKEN
+                  optional: true
+            - name: IBM_APPLICATIONS
+              valueFrom:
+                secretKeyRef:
+                  name: aip-ibm-secrets
+                  key: IBM_APPLICATIONS
+                  optional: true
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 30
+          volumeMounts:
+            - name: app-data
+              mountPath: /app/data
+      volumes:
+        - name: app-data
+          persistentVolumeClaim:
+            claimName: aip-data

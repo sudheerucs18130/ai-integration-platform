@@ -1,0 +1,20 @@
+services:
+  autonomous-integration-platform:
+    build: .
+    image: autonomous-integration-platform:local
+    container_name: autonomous-integration-platform
+    ports:
+      - "8000:8000"
+    environment:
+      AIP_SOURCE_MODE: auto
+      AIP_DB_PATH: /app/data/platform.db
+      IBM_REQUEST_TIMEOUT_SECONDS: "4"
+      # IBM_APPLICATIONS: '[{"name":"IBM App Connect Flow","url":"https://example.com/health","business_criticality":"high","sla_target_ms":1000}]'
+      # IBM_TELEMETRY_URL: "https://telemetry-bridge.example.com/integration-health"
+      # IBM_TELEMETRY_TOKEN: "replace-with-token"
+    volumes:
+      - aip_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  aip_data:

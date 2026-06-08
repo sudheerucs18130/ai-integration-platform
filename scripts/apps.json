@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Example Healthy App",
+    "url": "https://httpbin.org/status/200",
+    "sla_target_ms": 1000,
+    "business_criticality": "high",
+    "description": "Public test endpoint returning 200"
+  },
+  {
+    "name": "Example Bad App",
+    "url": "https://httpbin.org/status/500",
+    "sla_target_ms": 1000,
+    "business_criticality": "medium",
+    "description": "Public test endpoint returning 500 to simulate errors"
+  }
+]

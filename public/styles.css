@@ -151,6 +151,34 @@ select {
   min-height: 42px;
 }
 
+.token-input {
+  min-height: 36px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  width: 260px;
+}
+
+#toastContainer {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  display: grid;
+  gap: 10px;
+  z-index: 9999;
+}
+.toast {
+  min-width: 260px;
+  max-width: 420px;
+  padding: 12px 14px;
+  background: rgba(23, 32, 42, 0.95);
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+.toast.error { background: rgba(180, 35, 24, 0.95); }
+
 .button {
   min-height: 38px;
   display: inline-flex;

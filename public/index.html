@@ -7,12 +7,13 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
+    <div id="toastContainer" aria-live="polite" aria-atomic="true"></div>
     <div class="shell">
       <aside class="sidebar" aria-label="Primary">
         <div class="brand">
           <span class="brand-mark">AI</span>
           <div>
-            <strong>ResilienceOps</strong>
+            <strong>IBM AI NextGen</strong>
             <small>Autonomous integrations</small>
           </div>
         </div>
@@ -36,6 +37,7 @@
           <div class="topbar-actions">
             <span id="sourceStatus" class="source-pill">Source pending</span>
             <span id="streamStatus" class="stream-pill">Connecting</span>
+            <input id="apiToken" class="token-input" type="password" placeholder="API token (optional)" aria-label="API token" />
             <button id="refreshBtn" class="button secondary" type="button">Refresh</button>
           </div>
         </header>

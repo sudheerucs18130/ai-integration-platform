@@ -190,6 +190,23 @@ async function loadAll() {
   }
 }
 
+// Fetch and render app version
+async function loadVersion() {
+  try {
+    const v = await api('/api/version');
+    if (v && v.commit) {
+      const el = document.getElementById('appVersion');
+      if (el) el.textContent = `Version: ${v.commit}`;
+    }
+  } catch (err) {
+    // ignore version failures
+  }
+}
+
+// Initial load
+loadAll();
+loadVersion();
+
 function setStreamState(status, message) {
   els.streamStatus.className = `stream-pill ${status}`;
   if (status === "connected") {

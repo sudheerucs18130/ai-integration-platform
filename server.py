@@ -25,6 +25,7 @@ from typing import Any
 from urllib.parse import parse_qs, unquote, urlparse
 import urllib.error
 import urllib.request
+import subprocess
 
 
 APP_DIR = Path(__file__).resolve().parent
@@ -219,6 +220,25 @@ def ibm_source_configured() -> bool:
 def set_source_state(**updates: Any) -> None:
     with RUNTIME_LOCK:
         SOURCE_STATE.update(updates)
+
+
+def get_version() -> dict[str, Any]:
+    """Return a small version object: commit short hash from GIT_COMMIT env,
+    or from the repository, or from a VERSION file."""
+    commit = os.environ.get("GIT_COMMIT") or os.environ.get("AIP_GIT_COMMIT")
+    if commit:
+        return {"commit": str(commit)}
+    try:
+        out = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=APP_DIR, stderr=subprocess.DEVNULL)
+        return {"commit": out.decode().strip()}
+    except Exception:
+        try:
+            vfile = APP_DIR / "VERSION"
+            if vfile.exists():
+                return {"commit": vfile.read_text().strip()}
+        except Exception:
+            pass
+    return {"commit": None}
 
 
 def source_status() -> dict[str, Any]:
@@ -1774,6 +1794,8 @@ class PlatformHandler(BaseHTTPRequestHandler):
                 )
             elif path == "/api/summary":
                 self.send_json(get_summary())
+            elif path == "/api/version":
+                self.send_json(get_version())
             elif path == "/api/workflows":
                 self.send_json(get_workflows())
             elif path == "/api/telemetry":

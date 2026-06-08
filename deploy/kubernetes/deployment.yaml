@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: ghcr.io/OWNER/autonomous-integration-platform:latest
+          image: ghcr.io/sudheerucs18130/ai-integration-platform:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8000

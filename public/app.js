@@ -16,6 +16,8 @@ const els = {
   streamStatus: document.getElementById("streamStatus"),
   refreshBtn: document.getElementById("refreshBtn"),
   sourceStatus: document.getElementById("sourceStatus"),
+  apiToken: document.getElementById("apiToken"),
+  toastContainer: document.getElementById("toastContainer"),
   kpiGrid: document.getElementById("overview"),
   workflowFilter: document.getElementById("workflowFilter"),
   applicationForm: document.getElementById("applicationForm"),
@@ -100,8 +102,16 @@ function riskMeter(score) {
 }
 
 async function api(path, options = {}) {
+  const headers = { "Content-Type": "application/json" };
+  // If an API token is provided in the UI, include it for mutating requests
+  try {
+    const token = els.apiToken?.value?.trim();
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+  } catch (err) {
+    // ignore
+  }
   const response = await fetch(path, {
-    headers: { "Content-Type": "application/json" },
+    headers,
     ...options
   });
   if (!response.ok) {
@@ -112,9 +122,27 @@ async function api(path, options = {}) {
     } catch {
       // Keep the generic message when a response is not JSON.
     }
+    // Show toast for errors
+    showToast(message, 'error');
     throw new Error(message);
   }
   return response.json();
+}
+
+function showToast(message, type = 'info', timeout = 5000) {
+  try {
+    const container = els.toastContainer;
+    if (!container) return;
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = message;
+    container.appendChild(el);
+    setTimeout(() => {
+      el.remove();
+    }, timeout);
+  } catch (err) {
+    // ignore
+  }
 }
 
 async function loadAll() {
@@ -177,6 +205,26 @@ function setStreamState(status, message) {
   } else {
     els.streamStatus.textContent = "Connecting";
   }
+}
+
+// Persist API token in sessionStorage so users don't need to retype on reload
+try {
+  const saved = sessionStorage.getItem('aip_api_token');
+  if (saved && els.apiToken) els.apiToken.value = saved;
+} catch (err) {
+  // ignore
+}
+
+if (els.apiToken) {
+  els.apiToken.addEventListener('input', (e) => {
+    try {
+      const v = e.target.value?.trim();
+      if (v) sessionStorage.setItem('aip_api_token', v);
+      else sessionStorage.removeItem('aip_api_token');
+    } catch (err) {
+      // ignore
+    }
+  });
 }
 
 function renderAll() {

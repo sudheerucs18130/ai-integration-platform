@@ -39,6 +39,7 @@ IBM_TELEMETRY_TOKEN = os.environ.get("IBM_TELEMETRY_TOKEN") or os.environ.get("I
 IBM_APPLICATIONS = os.environ.get("IBM_APPLICATIONS", "").strip()
 IBM_APPLICATION_URLS = os.environ.get("IBM_APPLICATION_URLS", "").strip()
 IBM_REQUEST_TIMEOUT_SECONDS = float(os.environ.get("IBM_REQUEST_TIMEOUT_SECONDS", "4"))
+AIP_API_TOKEN = os.environ.get("AIP_API_TOKEN", "").strip()
 
 DB_LOCK = threading.RLock()
 RUNTIME_LOCK = threading.RLock()
@@ -1701,6 +1702,23 @@ class PlatformHandler(BaseHTTPRequestHandler):
         self.send_response(204)
         self.end_headers()
 
+    def _require_api_token(self, path: str) -> None:
+        """Require a bearer token for POST endpoints when AIP_API_TOKEN is set.
+
+        Public read endpoints remain accessible. Mutating endpoints (POST) require
+        the header: Authorization: Bearer <token>
+        """
+        # Only enforce for mutating endpoints
+        if not AIP_API_TOKEN:
+            return
+        # Allowed POST paths that are public could be enumerated here; for now require token for all POST
+        auth = self.headers.get("Authorization", "") or ""
+        if not auth.startswith("Bearer "):
+            raise ApiError(401, "Authorization required")
+        token = auth.split(None, 1)[1].strip()
+        if token != AIP_API_TOKEN:
+            raise ApiError(403, "Invalid API token")
+
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         if parsed.path == "/api/events":
@@ -1714,6 +1732,10 @@ class PlatformHandler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
         parsed = urlparse(self.path)
         try:
+            # If an API token is configured, require it for mutating endpoints.
+            # Place this inside the try block so ApiError is caught and returned
+            # as a JSON error response instead of bubbling up.
+            self._require_api_token(parsed.path)
             payload = self.read_json_body()
             incident_match = re.fullmatch(r"/api/incidents/(\d+)/remediate", parsed.path)
             action_match = re.fullmatch(r"/api/actions/(\d+)/approve", parsed.path)
